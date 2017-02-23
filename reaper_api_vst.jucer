@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="OIaj6o" name="reaper_api_vst" projectType="audioplug" version="1.0.0"
+              bundleIdentifier="com.yourcompany.reaper_api_vst" includeBinaryInAppConfig="1"
+              buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
+              buildAAX="0" buildStandalone="0" pluginName="reaper_api_vst"
+              pluginDesc="reaper_api_vst" pluginManufacturer="Xenakios" pluginManufacturerCode="xens"
+              pluginCode="Oiaj" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
+              pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
+              pluginAUExportPrefix="reaper_api_vstAU" pluginRTASCategory=""
+              aaxIdentifier="com.yourcompany.reaper_api_vst" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
+              jucerVersion="4.3.1">
+  <MAINGROUP id="fAZgx1" name="reaper_api_vst">
+    <GROUP id="{E9A9C2E3-521D-CD0A-28EB-512DB79955D2}" name="Source">
+      <FILE id="sbS8Ko" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="qHdiH0" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="nIAZe6" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="aKYNYP" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reaper_api_vst"
+                       cppLanguageStandard="c++14" cppLibType="libc++"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reaper_api_vst"
+                       cppLanguageStandard="c++14" cppLibType="libc++"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../gitrepos/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2015 targetFolder="Builds/VisualStudio2015">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="reaper_api_vst"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="reaper_api_vst"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../gitrepos/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2015>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" cppLanguageStandard="-std=c++14">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reaper_api_vst"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reaper_api_vst"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../gitrepos/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+</JUCERPROJECT>
