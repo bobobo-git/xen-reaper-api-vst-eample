@@ -190,6 +190,8 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		});
 		if (errcnt > 0)
 			Logger::writeToLog(String(errcnt) + " errors when loading reaper api funcs");
+		var aevar = getProperties()["aeffect"];
+		m_ae = (VstEffectInterface*)(int64)aevar;
 		return;
 	}
 
@@ -199,13 +201,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 
 void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 {
-	/*
-	void* track=(void*)m_cb(&m_effect, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
-	void *take=(void*)m_cb(&m_effect, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
-	*/
-	var aevar = getProperties()["aeffect"];
-	VstEffectInterface* aeffect = (VstEffectInterface*)(int64)aevar;
-	MediaTrack* tr = (MediaTrack*)m_host_cb(aeffect, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
+	MediaTrack* tr = getReaperTrack();
 	if (tr != nullptr)
 	{
 		SetMediaTrackInfo_Value(tr, "D_VOL", gain);
@@ -214,9 +210,7 @@ void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 
 void Reaper_api_vstAudioProcessor::setTakeName(String name)
 {
-	var aevar = getProperties()["aeffect"];
-	VstEffectInterface* aeffect = (VstEffectInterface*)(int64)aevar;
-	MediaItem_Take* tk = (MediaItem_Take*)m_host_cb(aeffect, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
+	MediaItem_Take* tk = getReaperTake();
 	if (tk != nullptr)
 	{
 		GetSetMediaItemTakeInfo_String(tk, "P_NAME", (char*)name.toRawUTF8(), true);
@@ -224,8 +218,22 @@ void Reaper_api_vstAudioProcessor::setTakeName(String name)
 	}
 	else
 	{
-		AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Error", "Plugin is not loaded into a take", "OK");
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Plugin is not loaded into a Reaper take", "OK");
 	}
+}
+
+MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
+{
+	if (m_ae == nullptr)
+		return nullptr;
+	return (MediaTrack*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
+}
+
+MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
+{
+	if (m_ae == nullptr)
+		return nullptr;
+	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
 }
 
 //==============================================================================

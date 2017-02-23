@@ -18,11 +18,13 @@ Reaper_api_vstAudioProcessorEditor::Reaper_api_vstAudioProcessorEditor (Reaper_a
 	m_track_vol_slider(Slider::LinearHorizontal,Slider::TextBoxRight)
 {
 	addAndMakeVisible(&m_track_vol_slider);
+	if (processor.getReaperTrack() == nullptr)
+		m_track_vol_slider.setEnabled(false);
 	m_track_vol_slider.setRange(0.0, 1.0);
 	m_track_vol_slider.addListener(this);
 	addAndMakeVisible(&m_test_button);
 	m_test_button.addListener(this);
-	m_test_button.setButtonText("Test");
+	m_test_button.setButtonText("Take FX test");
 	setSize (400, 300);
 }
 
@@ -43,7 +45,7 @@ void Reaper_api_vstAudioProcessorEditor::paint (Graphics& g)
 void Reaper_api_vstAudioProcessorEditor::resized()
 {
 	m_track_vol_slider.setBounds(1, 1, getWidth() - 2, 25);
-	m_test_button.setBounds(1, 30, 100, 25);
+	m_test_button.setBounds(1, 30, 200, 25);
 }
 
 void Reaper_api_vstAudioProcessorEditor::sliderValueChanged(Slider * slid)

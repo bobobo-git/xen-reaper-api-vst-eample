@@ -13,9 +13,10 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
-//==============================================================================
-/**
-*/
+
+class MediaTrack;
+class MediaItem_Take;
+
 class Reaper_api_vstAudioProcessor  : public AudioProcessor
 {
 public:
@@ -57,8 +58,11 @@ public:
 	void afterCreate() override;
 	void setTrackVolume(double gain);
 	void setTakeName(String name);
+	MediaTrack* getReaperTrack();
+	MediaItem_Take* getReaperTake();
 private:
 	VstHostCallback m_host_cb = nullptr;
+	VstEffectInterface* m_ae = nullptr;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
 };
