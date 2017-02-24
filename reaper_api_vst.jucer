@@ -72,8 +72,10 @@
     </VS2015>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" cppLanguageStandard="-std=c++14">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reaper_api_vst"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reaper_api_vst"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reaper_api_vst"
+                       linuxArchitecture="-m64"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reaper_api_vst"
+                       linuxArchitecture="-m64"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../JUCE/modules"/>
