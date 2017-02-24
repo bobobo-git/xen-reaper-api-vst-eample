@@ -17,9 +17,10 @@ Reaper_api_vstAudioProcessorEditor::Reaper_api_vstAudioProcessorEditor (Reaper_a
     : AudioProcessorEditor (&p), processor (p), 
 	m_track_vol_slider(Slider::LinearHorizontal,Slider::TextBoxRight)
 {
+	printf("xenakios editor ctor %p", processor.getReaperTrack());	
 	addAndMakeVisible(&m_track_vol_slider);
-	if (processor.getReaperTrack() == nullptr)
-		m_track_vol_slider.setEnabled(false);
+	//if (processor.getReaperTrack() == nullptr)
+	//	m_track_vol_slider.setEnabled(false);
 	m_track_vol_slider.setRange(0.0, 1.0);
 	m_track_vol_slider.addListener(this);
 	addAndMakeVisible(&m_test_button);

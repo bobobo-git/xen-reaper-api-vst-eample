@@ -181,7 +181,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		m_host_cb = (VstHostCallback)(int64)cbvar;
 		if (m_host_cb == nullptr)
 		{
-			ShowConsoleMsg("audiomastercallback null\n");
+			printf("audiomastercallback null\n");
 			return;
 		}
 		int errcnt = REAPERAPI_LoadAPI([this](const char* funcname)
@@ -189,11 +189,11 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 			return (void*)m_host_cb(NULL, 0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
 		});
 		if (errcnt > 0)
-			ShowConsoleMsg("errors when loading reaper api funcs\n");
+			printf("errors when loading reaper api funcs\n");
 		var aevar = getProperties()["aeffect"];
 		m_ae = (VstEffectInterface*)(int64)aevar;
 		if (m_ae == nullptr)
-			ShowConsoleMsg("aeffect is null\n");		
+			printf("aeffect is null\n");		
 		return;
 	}
 
