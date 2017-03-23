@@ -9,7 +9,7 @@
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="reaper_api_vstAU" pluginRTASCategory=""
               aaxIdentifier="com.yourcompany.reaper_api_vst" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="4.3.1">
+              jucerVersion="4.3.1" enableIAA="0">
   <MAINGROUP id="fAZgx1" name="reaper_api_vst">
     <GROUP id="{E9A9C2E3-521D-CD0A-28EB-512DB79955D2}" name="Source">
       <FILE id="sbS8Ko" name="PluginProcessor.cpp" compile="1" resource="0"
