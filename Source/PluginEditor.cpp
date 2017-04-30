@@ -17,8 +17,13 @@ Reaper_api_vstAudioProcessorEditor::Reaper_api_vstAudioProcessorEditor (Reaper_a
     : AudioProcessorEditor (&p), processor (p), 
 	m_track_vol_slider(Slider::LinearHorizontal,Slider::TextBoxRight)
 {
-	printf("xenakios editor ctor %p\n", processor.getReaperTrack());	
 	addAndMakeVisible(&m_track_vol_slider);
+	addAndMakeVisible(&m_text_ed);
+	m_text_ed.addListener(this);
+	if (processor.getReaperTrack() != nullptr)
+		m_text_ed.setText(processor.getTrackName(), dontSendNotification);
+	if (processor.getReaperTake() != nullptr)
+		m_text_ed.setText(processor.getTakeName(), dontSendNotification);
 	if (processor.getReaperTrack() == nullptr)
 		m_track_vol_slider.setEnabled(false);
 	m_track_vol_slider.setRange(0.0, 1.0);
@@ -47,6 +52,7 @@ void Reaper_api_vstAudioProcessorEditor::resized()
 {
 	m_track_vol_slider.setBounds(1, 1, getWidth() - 2, 25);
 	m_test_button.setBounds(1, 30, 200, 25);
+	m_text_ed.setBounds(1, 60, getWidth() - 2, 25);
 }
 
 void Reaper_api_vstAudioProcessorEditor::sliderValueChanged(Slider * slid)
@@ -59,4 +65,15 @@ void Reaper_api_vstAudioProcessorEditor::buttonClicked(Button * but)
 {
 	if (but == &m_test_button)
 		processor.setTakeName("Changed from VST plugin");
+}
+
+void Reaper_api_vstAudioProcessorEditor::textEditorTextChanged(TextEditor & ed)
+{
+	if (&ed == &m_text_ed)
+	{
+		if (processor.getReaperTake() != nullptr)
+			processor.setTakeName(m_text_ed.getText());
+		if (processor.getReaperTrack() != nullptr)
+			processor.setTrackName(m_text_ed.getText());
+	}
 }

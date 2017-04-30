@@ -18,7 +18,7 @@
 /**
 */
 class Reaper_api_vstAudioProcessorEditor  : public AudioProcessorEditor, 
-	public Slider::Listener, public Button::Listener
+	public Slider::Listener, public Button::Listener, public TextEditor::Listener
 {
 public:
     Reaper_api_vstAudioProcessorEditor (Reaper_api_vstAudioProcessor&);
@@ -29,11 +29,11 @@ public:
     void resized() override;
 	void sliderValueChanged(Slider* slid) override;
 	void buttonClicked(Button* but) override;
+	void textEditorTextChanged(TextEditor& ed) override;
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     Reaper_api_vstAudioProcessor& processor;
 	Slider m_track_vol_slider;
 	TextButton m_test_button;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
+	TextEditor m_text_ed;
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
 };

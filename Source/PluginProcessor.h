@@ -57,7 +57,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 	void afterCreate() override;
 	void setTrackVolume(double gain);
+	String getTakeName();
 	void setTakeName(String name);
+	String getTrackName();
+	void setTrackName(String name);
 	MediaTrack* getReaperTrack();
 	MediaItem_Take* getReaperTake();
 private:

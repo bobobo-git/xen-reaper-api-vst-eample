@@ -210,6 +210,14 @@ void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 	}
 }
 
+String Reaper_api_vstAudioProcessor::getTakeName()
+{
+	const char* name = GetTakeName(getReaperTake());
+	if (name != nullptr)
+		return String(CharPointer_UTF8(name));
+	return String();
+}
+
 void Reaper_api_vstAudioProcessor::setTakeName(String name)
 {
 	MediaItem_Take* tk = getReaperTake();
@@ -222,6 +230,20 @@ void Reaper_api_vstAudioProcessor::setTakeName(String name)
 	{
 		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Plugin is not loaded into a Reaper take", "OK");
 	}
+}
+
+String Reaper_api_vstAudioProcessor::getTrackName()
+{
+	char buf[2048];
+	if (GetSetMediaTrackInfo_String(getReaperTrack(), "P_NAME", buf, false) == true)
+		return String(CharPointer_UTF8(buf));
+	return String();
+}
+
+void Reaper_api_vstAudioProcessor::setTrackName(String name)
+{
+	GetSetMediaTrackInfo_String(getReaperTrack(), "P_NAME", (char*)name.toRawUTF8(), true);
+	UpdateArrange();
 }
 
 MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
