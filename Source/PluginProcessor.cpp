@@ -8,6 +8,19 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 #define REAPERAPI_IMPLEMENT
 #include "reaper_plugin_functions.h"
 
+// At least the last time tested, Reaper on Linux doesn't support ShowConsoleMsg
+#ifndef JUCE_LINUX
+void LogToReaper(String txt)
+{
+	ShowConsoleMsg(txt.toRawUTF8());
+}
+#else
+void LogToReaper(String txt)
+{
+	printf(txt.toRawUTF8());
+}
+#endif
+
 //==============================================================================
 Reaper_api_vstAudioProcessor::Reaper_api_vstAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -176,7 +189,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		m_host_cb = (VstHostCallback)(int64)cbvar;
 		if (m_host_cb == nullptr)
 		{
-			printf("audiomastercallback null\n");
+			LogToReaper("audiomastercallback null\n");
 			return;
 		}
 		int errcnt = REAPERAPI_LoadAPI([this](const char* funcname)
@@ -184,11 +197,11 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 			return (void*)m_host_cb(NULL, 0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
 		});
 		if (errcnt > 0)
-			printf("errors when loading reaper api funcs\n");
+			LogToReaper("errors when loading reaper api funcs\n");
 		var aevar = getProperties()["aeffect"];
 		m_ae = (VstEffectInterface*)(int64)aevar;
 		if (m_ae == nullptr)
-			printf("aeffect is null\n");		
+			LogToReaper("aeffect is null\n");
 		return;
 	}
 

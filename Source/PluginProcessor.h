@@ -9,6 +9,9 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
 
+
+void LogToReaper(String txt);
+
 class MediaTrack;
 class MediaItem_Take;
 
