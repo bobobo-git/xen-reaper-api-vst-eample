@@ -13,7 +13,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 /**
 */
 class Reaper_api_vstAudioProcessorEditor  : public AudioProcessorEditor, 
-	public Slider::Listener, public Button::Listener, public TextEditor::Listener
+	public Slider::Listener, public Button::Listener, public TextEditor::Listener,
+	public Timer
 {
 public:
     Reaper_api_vstAudioProcessorEditor (Reaper_api_vstAudioProcessor&);
@@ -25,10 +26,12 @@ public:
 	void sliderValueChanged(Slider* slid) override;
 	void buttonClicked(Button* but) override;
 	void textEditorTextChanged(TextEditor& ed) override;
+	void timerCallback() override;
 private:
     Reaper_api_vstAudioProcessor& processor;
 	Slider m_track_vol_slider;
 	TextButton m_test_button;
 	TextEditor m_text_ed;
+	ResizableCornerComponent m_resizer;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
 };

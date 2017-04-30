@@ -207,8 +207,6 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 
 }
 
-// Demonstrates how to get the Reaper MediaTrack where the plugin is loaded.
-
 void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 {
 	MediaTrack* tr = getReaperTrack();
@@ -254,12 +252,16 @@ void Reaper_api_vstAudioProcessor::setTrackName(String name)
 	UpdateArrange();
 }
 
+// Demonstrates how to get the Reaper MediaTrack where the plugin is loaded.
+
 MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 {
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaTrack*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
 }
+
+// Demonstrates how to get the Reaper MediaItem_Take where the plugin is loaded.
 
 MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 {
@@ -268,8 +270,6 @@ MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
 }
 
-//==============================================================================
-// This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Reaper_api_vstAudioProcessor();
