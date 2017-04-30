@@ -61,6 +61,8 @@ public:
 	void setTrackName(String name);
 	MediaTrack* getReaperTrack();
 	MediaItem_Take* getReaperTake();
+	int m_last_w = -1;
+	int m_last_h = -1;
 private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;

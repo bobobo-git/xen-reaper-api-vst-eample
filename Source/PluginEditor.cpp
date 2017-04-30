@@ -30,7 +30,9 @@ Reaper_api_vstAudioProcessorEditor::Reaper_api_vstAudioProcessorEditor (Reaper_a
 	addAndMakeVisible(&m_test_button);
 	m_test_button.addListener(this);
 	m_test_button.setButtonText("Take FX test");
-	setSize (400, 300);
+	if (processor.m_last_w<0 && processor.m_last_h<0)
+		setSize (400, 300);
+	else setSize(processor.m_last_w, processor.m_last_h);
 	startTimer(1000);
 }
 
@@ -79,6 +81,9 @@ void Reaper_api_vstAudioProcessorEditor::resized()
 	m_test_button.setBounds(1, 30, 200, 25);
 	m_text_ed.setBounds(1, 60, getWidth() - 2, 25);
 	m_resizer.setBounds(getWidth() - 16, getHeight() - 16, 16, 16);
+	processor.m_last_w = getWidth();
+	processor.m_last_h = getHeight();
+	m_was_resized = true;
 }
 
 void Reaper_api_vstAudioProcessorEditor::sliderValueChanged(Slider * slid)
@@ -107,4 +112,9 @@ void Reaper_api_vstAudioProcessorEditor::textEditorTextChanged(TextEditor & ed)
 void Reaper_api_vstAudioProcessorEditor::timerCallback()
 {
 	repaint();
+	if (m_was_resized == true)
+	{
+		processor.updateHostDisplay();
+		m_was_resized = false;
+	}
 }

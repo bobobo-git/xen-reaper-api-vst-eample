@@ -168,15 +168,27 @@ AudioProcessorEditor* Reaper_api_vstAudioProcessor::createEditor()
 //==============================================================================
 void Reaper_api_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+	ValueTree vt("reaperexamplestate");
+	vt.setProperty("gui_w", m_last_w, nullptr);
+	vt.setProperty("gui_h", m_last_h, nullptr);
+	MemoryOutputStream ms(destData, false);
+	vt.writeToStream(ms);
+	LogToReaper("Created state chunk of size " + String(destData.getSize())+"\n");
 }
 
 void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+	LogToReaper("Restoring state from chunk of size " + String(sizeInBytes)+"\n");
+	ValueTree vt = ValueTree::readFromData(data, sizeInBytes);
+	if (vt.isValid())
+	{
+		m_last_w = vt.getProperty("gui_w");
+		m_last_h = vt.getProperty("gui_h");
+		if (getActiveEditor())
+			getActiveEditor()->setSize(m_last_w, m_last_h);
+	}
+	else
+		LogToReaper("Chunk did not contain valid ValueTree\n");
 }
 
 

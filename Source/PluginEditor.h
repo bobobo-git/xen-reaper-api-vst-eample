@@ -33,5 +33,6 @@ private:
 	TextButton m_test_button;
 	TextEditor m_text_ed;
 	ResizableCornerComponent m_resizer;
+	bool m_was_resized = false;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
 };
