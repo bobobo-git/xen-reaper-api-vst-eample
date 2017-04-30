@@ -41,9 +41,8 @@ Reaper_api_vstAudioProcessorEditor::~Reaper_api_vstAudioProcessorEditor()
 //==============================================================================
 void Reaper_api_vstAudioProcessorEditor::paint (Graphics& g)
 {
-    g.fillAll (Colours::white);
-
-    g.setColour (Colours::black);
+    g.fillAll (Colours::grey);
+	g.setColour (Colours::black);
     g.setFont (15.0f);
     g.drawFittedText ("Hello, Reaper API!", getLocalBounds(), Justification::centred, 1);
 }
