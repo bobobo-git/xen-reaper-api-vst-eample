@@ -1,11 +1,6 @@
 /*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
+License : You are free to use this code as you wish but you must
+respect the separate licensing of JUCE and the Reaper SDK files.
 */
 
 #pragma once

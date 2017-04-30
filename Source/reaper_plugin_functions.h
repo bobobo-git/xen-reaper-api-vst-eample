@@ -24,6 +24,8 @@
 *  3. This notice may not be removed or altered from any source distribution.
 */
 
+// REAPERAPI_LoadAPI was altered for use with JUCE and VST plugins by Xenakios in 2016
+
 // Note: the C++ pure virtual interfaces used require the MSVC-compatible C++ ABI on Win32.  Sorry, mingw users.
 //
 // Reaper extensions: see http://www.cockos.com/reaper/sdk/plugin/plugin.php and reaper_plugin.h.
