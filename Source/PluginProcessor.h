@@ -61,6 +61,7 @@ public:
 	void setTrackName(String name);
 	MediaTrack* getReaperTrack();
 	MediaItem_Take* getReaperTake();
+	void extendedStateHasChanged();
 	int m_last_w = -1;
 	int m_last_h = -1;
 private:

@@ -174,6 +174,7 @@ void Reaper_api_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
 	MemoryOutputStream ms(destData, false);
 	vt.writeToStream(ms);
 	LogToReaper("Created state chunk of size " + String(destData.getSize())+"\n");
+	LogToReaper("Stored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
 }
 
 void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -184,6 +185,7 @@ void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int si
 	{
 		m_last_w = vt.getProperty("gui_w");
 		m_last_h = vt.getProperty("gui_h");
+		LogToReaper("Restored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
 		if (getActiveEditor())
 			getActiveEditor()->setSize(m_last_w, m_last_h);
 	}
@@ -280,6 +282,15 @@ MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
+}
+
+void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
+{
+	// Use VST2 API directly to notify Reaper of change for parameter -1. 
+	// That will be considered a generic state change of the plugin in Reaper so that Reaper will query the current plugin state
+	// and add an undo entry etc.
+	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
+	m_host_cb(m_ae, hostOpcodeParameterChanged, -1, 0, nullptr, 0.0f);
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

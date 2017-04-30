@@ -114,7 +114,7 @@ void Reaper_api_vstAudioProcessorEditor::timerCallback()
 	repaint();
 	if (m_was_resized == true)
 	{
-		processor.updateHostDisplay();
+		processor.extendedStateHasChanged();
 		m_was_resized = false;
 	}
 }
