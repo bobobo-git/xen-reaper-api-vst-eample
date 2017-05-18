@@ -96,14 +96,12 @@ void Reaper_api_vstAudioProcessor::changeProgramName (int index, const String& n
 //==============================================================================
 void Reaper_api_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    
 }
 
 void Reaper_api_vstAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -135,12 +133,6 @@ void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -157,7 +149,7 @@ void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 //==============================================================================
 bool Reaper_api_vstAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true; 
 }
 
 AudioProcessorEditor* Reaper_api_vstAudioProcessor::createEditor()
@@ -173,24 +165,26 @@ void Reaper_api_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
 	vt.setProperty("gui_h", m_last_h, nullptr);
 	MemoryOutputStream ms(destData, false);
 	vt.writeToStream(ms);
-	LogToReaper("Created state chunk of size " + String(destData.getSize())+"\n");
-	LogToReaper("Stored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
+	//LogToReaper("Created state chunk of size " + String(destData.getSize())+"\n");
+	//LogToReaper("Stored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
 }
 
 void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-	LogToReaper("Restoring state from chunk of size " + String(sizeInBytes)+"\n");
+	//LogToReaper("Restoring state from chunk of size " + String(sizeInBytes)+"\n");
 	ValueTree vt = ValueTree::readFromData(data, sizeInBytes);
 	if (vt.isValid())
 	{
 		m_last_w = vt.getProperty("gui_w");
 		m_last_h = vt.getProperty("gui_h");
-		LogToReaper("Restored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
+		//LogToReaper("Restored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
 		if (getActiveEditor())
 			getActiveEditor()->setSize(m_last_w, m_last_h);
 	}
 	else
-		LogToReaper("Chunk did not contain valid ValueTree\n");
+	{
+		//LogToReaper("Chunk did not contain valid ValueTree\n");
+	}
 }
 
 
