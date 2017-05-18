@@ -87,6 +87,9 @@ private:
 	struct env_info
 	{
 		env_info() {}
+		env_info(int notenum, double len, int trackid, int fxid, int parid)
+			: m_note_number(notenum), m_len(len), m_track_index(trackid), m_fx_index(fxid),
+			m_param_index(parid) {}
 		breakpoint_envelope m_env;
 		double m_tpos = 0.0;
 		int m_note_number = 0;
