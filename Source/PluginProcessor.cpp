@@ -130,7 +130,15 @@ bool Reaper_api_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 
 void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
+	MessageManager::callAsync([midiMessages]() 
+	{
+		iterateMidiBuffer(midiMessages, [](MidiMessage& msg, int pos) 
+		{
+			LogToReaper(String(msg.getControllerNumber()) + " " + String(msg.getControllerValue())+"\n");
+		});
+	});
+	
+	const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)

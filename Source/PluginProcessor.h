@@ -9,6 +9,21 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
 
+template<typename F>
+inline void iterateMidiBuffer(const MidiBuffer& mb, F&& f)
+{
+	if (mb.isEmpty())
+		return;
+	MidiBuffer::Iterator msgiter(mb);
+	MidiMessage msg;
+	int pos = 0;
+	for (int i = 0; i < mb.getNumEvents(); ++i)
+	{
+		msgiter.getNextEvent(msg, pos);
+		f(msg, pos);
+	}
+}
+
 
 void LogToReaper(String txt);
 
