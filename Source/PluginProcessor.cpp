@@ -34,6 +34,22 @@ Reaper_api_vstAudioProcessor::Reaper_api_vstAudioProcessor()
                        )
 #endif
 {
+	env_info info;
+	info.m_note_number = 48;
+	info.m_track_index = 1;
+	info.m_env.AddNode({ 0.0,0.0 });
+	info.m_env.AddNode({ 0.5,1.0 });
+	info.m_env.AddNode({ 1.0,0.0 });
+	m_envs.push_back(info);
+	info.m_env.ClearAllNodes();
+	info.m_note_number = 60;
+	info.m_track_index = 1;
+	info.m_len = 2.0;
+	info.m_env.AddNode({ 0.0,1.0 });
+	info.m_env.AddNode({ 0.25,0.0 });
+	info.m_env.AddNode({ 1.75,0.0 });
+	info.m_env.AddNode({ 2.00,1.0 });
+	m_envs.push_back(info);
 }
 
 Reaper_api_vstAudioProcessor::~Reaper_api_vstAudioProcessor()
@@ -130,14 +146,38 @@ bool Reaper_api_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 
 void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	MessageManager::callAsync([midiMessages]() 
+	iterateMidiBuffer(midiMessages, [this](MidiMessage& msg, int pos)
 	{
-		iterateMidiBuffer(midiMessages, [](MidiMessage& msg, int pos) 
+		if (msg.isNoteOn() == true)
 		{
-			LogToReaper(String(msg.getControllerNumber()) + " " + String(msg.getControllerValue())+"\n");
-		});
+			for (auto& e : m_envs)
+			{
+				if (e.m_note_number == msg.getNoteNumber())
+				{
+					e.m_tpos = 0.0;
+					e.m_playing = true;
+				}
+			}
+		}
 	});
 	
+	for (auto& e : m_envs)
+	{
+		if (e.m_playing == true)
+		{
+			if (e.m_tpos < e.m_len)
+			{
+				double v = e.m_env.GetInterpolatedNodeValue(e.m_tpos);
+				MediaTrack* track = GetTrack(nullptr, e.m_track_index);
+				TrackFX_SetParamNormalized(track, e.m_fx_index, e.m_param_index, v);
+				e.m_tpos += (double)buffer.getNumSamples() / getSampleRate();
+			}
+			else
+			{
+				e.m_playing = false;
+			}
+		}
+	}
 	const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 

@@ -9,6 +9,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
 
+#include "breakpoint_envelope.h"
+
 template<typename F>
 inline void iterateMidiBuffer(const MidiBuffer& mb, F&& f)
 {
@@ -82,6 +84,19 @@ public:
 private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;
-    //==============================================================================
+	struct env_info
+	{
+		env_info() {}
+		breakpoint_envelope m_env;
+		double m_tpos = 0.0;
+		int m_note_number = 0;
+		bool m_playing = false;
+		double m_len = 1.0;
+		int m_track_index = 0;
+		int m_fx_index = 0;
+		int m_param_index = 0;
+	};
+	std::vector<env_info> m_envs;
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
 };
