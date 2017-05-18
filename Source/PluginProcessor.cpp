@@ -139,9 +139,10 @@ bool Reaper_api_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 }
 #endif
 
-void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void Reaper_api_vstAudioProcessor::handleMIDIMessages(MidiBuffer& messages)
 {
-	iterateMidiBuffer(midiMessages, [this](MidiMessage& msg, int pos)
+	// Slightly inefficient algorithm here, the envelope infos are iterated over again for each note on message...
+	iterateMidiBuffer(messages, [this](MidiMessage& msg, int pos)
 	{
 		if (msg.isNoteOn() == true)
 		{
@@ -155,7 +156,11 @@ void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 			}
 		}
 	});
-	
+}
+
+void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+{
+	handleMIDIMessages(midiMessages);
 	for (auto& e : m_envs)
 	{
 		if (e.m_playing == true)

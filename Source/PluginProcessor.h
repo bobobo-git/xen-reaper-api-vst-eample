@@ -84,6 +84,7 @@ public:
 private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;
+	void handleMIDIMessages(MidiBuffer& mb);
 	struct env_info
 	{
 		env_info() {}
