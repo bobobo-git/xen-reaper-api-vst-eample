@@ -8,6 +8,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 #define REAPERAPI_IMPLEMENT
 #include "reaper_plugin_functions.h"
 
+#include "reapervst3.h"
+
 // At least the last time tested, Reaper on Linux doesn't support ShowConsoleMsg
 #ifndef JUCE_LINUX
 void LogToReaper(String txt)
@@ -252,15 +254,31 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		{
 			return (void*)m_host_cb(NULL, 0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
 		});
-		if (errcnt > 0)
-			LogToReaper("errors when loading reaper api funcs\n");
+		if (errcnt > 0 && ShowConsoleMsg!=nullptr)
+			LogToReaper("some errors when loading reaper api functions\n");
 		var aevar = getProperties()["aeffect"];
 		m_ae = (VstEffectInterface*)(int64)aevar;
 		if (m_ae == nullptr)
 			LogToReaper("aeffect is null\n");
 		return;
 	}
-
+	if (getProperties().contains("hostctx") == true)
+	{
+		// VST3
+		auto hostctx = (Steinberg::FUnknown*)(int)getProperties()["hostctx"];
+		IReaperHostApplication *reaperptr = nullptr;
+		hostctx->queryInterface(IReaperHostApplication::iid, (void**)&reaperptr);
+		if (reaperptr != nullptr)
+		{
+			int errcnt = REAPERAPI_LoadAPI([reaperptr](const char* funcname)
+			{
+				return reaperptr->getReaperApi(funcname);
+			});
+			LogToReaper("got reaper vst3 host context\n");
+			if (errcnt>0 && ShowConsoleMsg!=nullptr)
+				LogToReaper("some errors when loading reaper api functions\n");
+		} 
+	}
 }
 
 void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
@@ -332,7 +350,9 @@ void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
 	// That will be considered a generic state change of the plugin in Reaper so that Reaper will query the current plugin state
 	// and add an undo entry etc.
 	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
-	m_host_cb(m_ae, hostOpcodeParameterChanged, -1, 0, nullptr, 0.0f);
+	if (m_host_cb!=nullptr)
+		m_host_cb(m_ae, hostOpcodeParameterChanged, -1, 0, nullptr, 0.0f);
+	// vst3...uhum...
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

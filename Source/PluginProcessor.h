@@ -8,7 +8,7 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
-
+#include <pluginterfaces/base/funknown.h>
 #include "breakpoint_envelope.h"
 
 template<typename F>
