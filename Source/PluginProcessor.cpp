@@ -219,7 +219,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 	if (getProperties().contains("hostctx") == true)
 	{
 		// VST3
-		auto hostctx = (Steinberg::FUnknown*)(int)getProperties()["hostctx"];
+		auto hostctx = (Steinberg::FUnknown*)(int64)getProperties()["hostctx"];
 		if (hostctx != nullptr)
 		{
 			IReaperHostApplication *reaperptr = nullptr;
