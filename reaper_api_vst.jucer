@@ -2,14 +2,15 @@
 
 <JUCERPROJECT id="OIaj6o" name="reaper_api_vst" projectType="audioplug" version="1.0.0"
               bundleIdentifier="com.yourcompany.reaper_api_vst" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
+              buildVST="1" buildVST3="1" buildAU="0" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" pluginName="reaper_api_vst"
               pluginDesc="reaper_api_vst" pluginManufacturer="Xenakios" pluginManufacturerCode="xens"
               pluginCode="Oiaj" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="reaper_api_vstAU" pluginRTASCategory=""
               aaxIdentifier="com.yourcompany.reaper_api_vst" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="4.3.1" enableIAA="0">
+              jucerVersion="5.0.2" displaySplashScreen="0" reportAppUsage="0"
+              splashScreenColour="Dark" enableIAA="0">
   <MAINGROUP id="fAZgx1" name="reaper_api_vst">
     <GROUP id="{E9A9C2E3-521D-CD0A-28EB-512DB79955D2}" name="Source">
       <FILE id="sbS8Ko" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -94,6 +95,31 @@
         <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
+    <VS2017 targetFolder="Builds/VisualStudio2017">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="reaper_api_vst" wholeProgramOptimisation="1"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="reaper_api_vst" wholeProgramOptimisation="1"
+                       useRuntimeLibDLL="0"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../gitrepos/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../gitrepos/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2017>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>

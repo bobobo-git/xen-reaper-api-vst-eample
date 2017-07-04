@@ -1,11 +1,6 @@
 /*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
+License : You are free to use this code as you wish but you must
+respect the separate licensing of JUCE and the Reaper SDK files.
 */
 
 #pragma once
@@ -18,7 +13,8 @@
 /**
 */
 class Reaper_api_vstAudioProcessorEditor  : public AudioProcessorEditor, 
-	public Slider::Listener, public Button::Listener
+	public Slider::Listener, public Button::Listener, public TextEditor::Listener,
+	public Timer
 {
 public:
     Reaper_api_vstAudioProcessorEditor (Reaper_api_vstAudioProcessor&);
@@ -29,11 +25,14 @@ public:
     void resized() override;
 	void sliderValueChanged(Slider* slid) override;
 	void buttonClicked(Button* but) override;
+	void textEditorTextChanged(TextEditor& ed) override;
+	void timerCallback() override;
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     Reaper_api_vstAudioProcessor& processor;
 	Slider m_track_vol_slider;
 	TextButton m_test_button;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
+	TextEditor m_text_ed;
+	ResizableCornerComponent m_resizer;
+	bool m_was_resized = false;
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessorEditor)
 };

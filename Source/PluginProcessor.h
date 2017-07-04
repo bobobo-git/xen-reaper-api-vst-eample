@@ -1,11 +1,6 @@
 /*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
+License : You are free to use this code as you wish but you must
+respect the separate licensing of JUCE and the Reaper SDK files.
 */
 
 #pragma once
@@ -13,6 +8,11 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
+#include <pluginterfaces/base/funknown.h>
+
+class IReaperHostApplication;
+
+void LogToReaper(String txt);
 
 class MediaTrack;
 class MediaItem_Take;
@@ -57,12 +57,19 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 	void afterCreate() override;
 	void setTrackVolume(double gain);
+	String getTakeName();
 	void setTakeName(String name);
+	String getTrackName();
+	void setTrackName(String name);
 	MediaTrack* getReaperTrack();
 	MediaItem_Take* getReaperTake();
+	void extendedStateHasChanged();
+	int m_last_w = -1;
+	int m_last_h = -1;
 private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;
-    //==============================================================================
+	IReaperHostApplication* m_reaperhost = nullptr;
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
 };

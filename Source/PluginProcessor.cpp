@@ -1,17 +1,28 @@
 /*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
+License : You are free to use this code as you wish but you must
+respect the separate licensing of JUCE and the Reaper SDK files.
 */
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #define REAPERAPI_IMPLEMENT
 #include "reaper_plugin_functions.h"
+
+#include "reapervst3.h"
+
+// At least the last time tested, Reaper on Linux doesn't support ShowConsoleMsg
+#ifndef JUCE_LINUX
+void LogToReaper(String txt)
+{
+	if (ShowConsoleMsg!=nullptr)
+		ShowConsoleMsg(txt.toRawUTF8());
+}
+#else
+void LogToReaper(String txt)
+{
+	printf(txt.toRawUTF8());
+}
+#endif
 
 //==============================================================================
 Reaper_api_vstAudioProcessor::Reaper_api_vstAudioProcessor()
@@ -26,6 +37,7 @@ Reaper_api_vstAudioProcessor::Reaper_api_vstAudioProcessor()
                        )
 #endif
 {
+	
 }
 
 Reaper_api_vstAudioProcessor::~Reaper_api_vstAudioProcessor()
@@ -88,14 +100,12 @@ void Reaper_api_vstAudioProcessor::changeProgramName (int index, const String& n
 //==============================================================================
 void Reaper_api_vstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    
 }
 
 void Reaper_api_vstAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -124,15 +134,9 @@ bool Reaper_api_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 
 void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
+	const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -149,7 +153,7 @@ void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, Midi
 //==============================================================================
 bool Reaper_api_vstAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true; 
 }
 
 AudioProcessorEditor* Reaper_api_vstAudioProcessor::createEditor()
@@ -160,15 +164,31 @@ AudioProcessorEditor* Reaper_api_vstAudioProcessor::createEditor()
 //==============================================================================
 void Reaper_api_vstAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+	ValueTree vt("reaperexamplestate");
+	vt.setProperty("gui_w", m_last_w, nullptr);
+	vt.setProperty("gui_h", m_last_h, nullptr);
+	MemoryOutputStream ms(destData, false);
+	vt.writeToStream(ms);
+	//LogToReaper("Created state chunk of size " + String(destData.getSize())+"\n");
+	//LogToReaper("Stored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
 }
 
 void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+	//LogToReaper("Restoring state from chunk of size " + String(sizeInBytes)+"\n");
+	ValueTree vt = ValueTree::readFromData(data, sizeInBytes);
+	if (vt.isValid())
+	{
+		m_last_w = vt.getProperty("gui_w");
+		m_last_h = vt.getProperty("gui_h");
+		//LogToReaper("Restored GUI size is " + String(m_last_w) + "x" + String(m_last_h)+"\n");
+		if (getActiveEditor())
+			getActiveEditor()->setSize(m_last_w, m_last_h);
+	}
+	else
+	{
+		//LogToReaper("Chunk did not contain valid ValueTree\n");
+	}
 }
 
 
@@ -181,7 +201,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		m_host_cb = (VstHostCallback)(int64)cbvar;
 		if (m_host_cb == nullptr)
 		{
-			printf("audiomastercallback null\n");
+			LogToReaper("audiomastercallback null\n");
 			return;
 		}
 		int errcnt = REAPERAPI_LoadAPI([this](const char* funcname)
@@ -189,17 +209,35 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 			return (void*)m_host_cb(NULL, 0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
 		});
 		if (errcnt > 0)
-			printf("errors when loading reaper api funcs\n");
+			LogToReaper("some errors when loading reaper api functions\n");
 		var aevar = getProperties()["aeffect"];
 		m_ae = (VstEffectInterface*)(int64)aevar;
 		if (m_ae == nullptr)
-			printf("aeffect is null\n");		
+			LogToReaper("aeffect is null\n");
 		return;
 	}
-
+	if (getProperties().contains("hostctx") == true)
+	{
+		// VST3
+		auto hostctx = (Steinberg::FUnknown*)(int64)getProperties()["hostctx"];
+		if (hostctx != nullptr)
+		{
+			IReaperHostApplication *reaperptr = nullptr;
+			hostctx->queryInterface(IReaperHostApplication::iid, (void**)&reaperptr);
+			if (reaperptr != nullptr)
+			{
+				int errcnt = REAPERAPI_LoadAPI([reaperptr](const char* funcname)
+				{
+					return reaperptr->getReaperApi(funcname);
+				});
+				LogToReaper("got reaper vst3 host context\n");
+				if (errcnt > 0)
+					LogToReaper("some errors when loading reaper api functions\n");
+				m_reaperhost = reaperptr;
+			}
+		}
+	}
 }
-
-// Demonstrates how to get the Reaper MediaTrack where the plugin is loaded.
 
 void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 {
@@ -208,6 +246,14 @@ void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 	{
 		SetMediaTrackInfo_Value(tr, "D_VOL", gain);
 	}
+}
+
+String Reaper_api_vstAudioProcessor::getTakeName()
+{
+	const char* name = GetTakeName(getReaperTake());
+	if (name != nullptr)
+		return String(CharPointer_UTF8(name));
+	return String();
 }
 
 void Reaper_api_vstAudioProcessor::setTakeName(String name)
@@ -224,22 +270,53 @@ void Reaper_api_vstAudioProcessor::setTakeName(String name)
 	}
 }
 
+String Reaper_api_vstAudioProcessor::getTrackName()
+{
+	char buf[2048];
+	if (GetSetMediaTrackInfo_String(getReaperTrack(), "P_NAME", buf, false) == true)
+		return String(CharPointer_UTF8(buf));
+	return String();
+}
+
+void Reaper_api_vstAudioProcessor::setTrackName(String name)
+{
+	GetSetMediaTrackInfo_String(getReaperTrack(), "P_NAME", (char*)name.toRawUTF8(), true);
+	UpdateArrange();
+}
+
+// Demonstrates how to get the Reaper MediaTrack where the plugin is loaded.
+
 MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 {
+	if (m_reaperhost != nullptr)
+		return (MediaTrack*)m_reaperhost->getReaperParent(1);
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaTrack*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
 }
 
+// Demonstrates how to get the Reaper MediaItem_Take where the plugin is loaded.
+
 MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 {
+	if (m_reaperhost != nullptr)
+		return (MediaItem_Take*)m_reaperhost->getReaperParent(2);
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
 }
 
-//==============================================================================
-// This creates new instances of the plugin..
+void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
+{
+	// Use VST2 API directly to notify Reaper of change for parameter -1. 
+	// That will be considered a generic state change of the plugin in Reaper so that Reaper will query the current plugin state
+	// and add an undo entry etc.
+	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
+	if (m_host_cb!=nullptr)
+		m_host_cb(m_ae, hostOpcodeParameterChanged, -1, 0, nullptr, 0.0f);
+	// vst3...uhum...
+}
+
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Reaper_api_vstAudioProcessor();
