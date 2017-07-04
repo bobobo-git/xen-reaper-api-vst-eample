@@ -14,7 +14,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 #ifndef JUCE_LINUX
 void LogToReaper(String txt)
 {
-	ShowConsoleMsg(txt.toRawUTF8());
+	if (ShowConsoleMsg!=nullptr)
+		ShowConsoleMsg(txt.toRawUTF8());
 }
 #else
 void LogToReaper(String txt)
@@ -254,7 +255,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		{
 			return (void*)m_host_cb(NULL, 0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
 		});
-		if (errcnt > 0 && ShowConsoleMsg!=nullptr)
+		if (errcnt > 0)
 			LogToReaper("some errors when loading reaper api functions\n");
 		var aevar = getProperties()["aeffect"];
 		m_ae = (VstEffectInterface*)(int64)aevar;
@@ -266,19 +267,22 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 	{
 		// VST3
 		auto hostctx = (Steinberg::FUnknown*)(int)getProperties()["hostctx"];
-		IReaperHostApplication *reaperptr = nullptr;
-		hostctx->queryInterface(IReaperHostApplication::iid, (void**)&reaperptr);
-		if (reaperptr != nullptr)
+		if (hostctx != nullptr)
 		{
-			int errcnt = REAPERAPI_LoadAPI([reaperptr](const char* funcname)
+			IReaperHostApplication *reaperptr = nullptr;
+			hostctx->queryInterface(IReaperHostApplication::iid, (void**)&reaperptr);
+			if (reaperptr != nullptr)
 			{
-				return reaperptr->getReaperApi(funcname);
-			});
-			LogToReaper("got reaper vst3 host context\n");
-			if (errcnt>0 && ShowConsoleMsg!=nullptr)
-				LogToReaper("some errors when loading reaper api functions\n");
-			m_reaperhost = reaperptr;
-		} 
+				int errcnt = REAPERAPI_LoadAPI([reaperptr](const char* funcname)
+				{
+					return reaperptr->getReaperApi(funcname);
+				});
+				LogToReaper("got reaper vst3 host context\n");
+				if (errcnt > 0)
+					LogToReaper("some errors when loading reaper api functions\n");
+				m_reaperhost = reaperptr;
+			}
+		}
 	}
 }
 
