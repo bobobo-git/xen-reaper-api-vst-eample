@@ -37,16 +37,6 @@ Reaper_api_vstAudioProcessor::Reaper_api_vstAudioProcessor()
                        )
 #endif
 {
-	m_envs.emplace_back(48, 1.0, 1, 0, 0);
-	m_envs.back().m_env.AddNode({ 0.0,0.0 });
-	m_envs.back().m_env.AddNode({ 0.5,1.0 });
-	m_envs.back().m_env.AddNode({ 1.0,0.0 });
-	
-	m_envs.emplace_back(60, 2.0, 1, 0, 0);
-	m_envs.back().m_env.AddNode({ 0.0,1.0 });
-	m_envs.back().m_env.AddNode({ 0.25,0.0 });
-	m_envs.back().m_env.AddNode({ 1.75,0.0 });
-	m_envs.back().m_env.AddNode({ 2.00,1.0 });
 	
 }
 
@@ -142,45 +132,8 @@ bool Reaper_api_vstAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 }
 #endif
 
-void Reaper_api_vstAudioProcessor::handleMIDIMessages(MidiBuffer& messages)
-{
-	// Slightly inefficient algorithm here, the envelope infos are iterated over again for each note on message...
-	iterateMidiBuffer(messages, [this](MidiMessage& msg, int pos)
-	{
-		if (msg.isNoteOn() == true)
-		{
-			for (auto& e : m_envs)
-			{
-				if (e.m_note_number == msg.getNoteNumber())
-				{
-					e.m_tpos = 0.0;
-					e.m_playing = true;
-				}
-			}
-		}
-	});
-}
-
 void Reaper_api_vstAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-	handleMIDIMessages(midiMessages);
-	for (auto& e : m_envs)
-	{
-		if (e.m_playing == true)
-		{
-			if (e.m_tpos < e.m_len)
-			{
-				double v = e.m_env.GetInterpolatedNodeValue(e.m_tpos);
-				MediaTrack* track = GetTrack(nullptr, e.m_track_index);
-				TrackFX_SetParamNormalized(track, e.m_fx_index, e.m_param_index, v);
-				e.m_tpos += (double)buffer.getNumSamples() / getSampleRate();
-			}
-			else
-			{
-				e.m_playing = false;
-			}
-		}
-	}
 	const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 

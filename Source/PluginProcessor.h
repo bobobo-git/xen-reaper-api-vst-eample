@@ -9,25 +9,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "juce_audio_processors/format_types/juce_VSTInterface.h"
 #include <pluginterfaces/base/funknown.h>
-#include "breakpoint_envelope.h"
 
 class IReaperHostApplication;
-
-template<typename F>
-inline void iterateMidiBuffer(const MidiBuffer& mb, F&& f)
-{
-	if (mb.isEmpty())
-		return;
-	MidiBuffer::Iterator msgiter(mb);
-	MidiMessage msg;
-	int pos = 0;
-	for (int i = 0; i < mb.getNumEvents(); ++i)
-	{
-		msgiter.getNextEvent(msg, pos);
-		f(msg, pos);
-	}
-}
-
 
 void LogToReaper(String txt);
 
@@ -87,23 +70,6 @@ private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;
 	IReaperHostApplication* m_reaperhost = nullptr;
-	void handleMIDIMessages(MidiBuffer& mb);
-	struct env_info
-	{
-		env_info() {}
-		env_info(int notenum, double len, int trackid, int fxid, int parid)
-			: m_note_number(notenum), m_len(len), m_track_index(trackid), m_fx_index(fxid),
-			m_param_index(parid) {}
-		breakpoint_envelope m_env;
-		double m_tpos = 0.0;
-		int m_note_number = 0;
-		bool m_playing = false;
-		double m_len = 1.0;
-		int m_track_index = 0;
-		int m_fx_index = 0;
-		int m_param_index = 0;
-	};
-	std::vector<env_info> m_envs;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
 };
