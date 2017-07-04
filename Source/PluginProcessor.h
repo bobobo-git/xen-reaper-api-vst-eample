@@ -11,6 +11,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 #include <pluginterfaces/base/funknown.h>
 #include "breakpoint_envelope.h"
 
+class IReaperHostApplication;
+
 template<typename F>
 inline void iterateMidiBuffer(const MidiBuffer& mb, F&& f)
 {
@@ -84,6 +86,7 @@ public:
 private:
 	VstHostCallback m_host_cb = nullptr;
 	VstEffectInterface* m_ae = nullptr;
+	IReaperHostApplication* m_reaperhost = nullptr;
 	void handleMIDIMessages(MidiBuffer& mb);
 	struct env_info
 	{

@@ -277,6 +277,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 			LogToReaper("got reaper vst3 host context\n");
 			if (errcnt>0 && ShowConsoleMsg!=nullptr)
 				LogToReaper("some errors when loading reaper api functions\n");
+			m_reaperhost = reaperptr;
 		} 
 	}
 }
@@ -330,6 +331,8 @@ void Reaper_api_vstAudioProcessor::setTrackName(String name)
 
 MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 {
+	if (m_reaperhost != nullptr)
+		return (MediaTrack*)m_reaperhost->getReaperParent(1);
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaTrack*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
@@ -339,6 +342,8 @@ MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 
 MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 {
+	if (m_reaperhost != nullptr)
+		return (MediaItem_Take*)m_reaperhost->getReaperParent(2);
 	if (m_ae == nullptr)
 		return nullptr;
 	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
