@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pluginterfaces\base\funknown.h>
+#include <pluginterfaces/base/funknown.h>
 
 class IReaperHostApplication : public Steinberg::FUnknown // publicly-visible interface
 {
