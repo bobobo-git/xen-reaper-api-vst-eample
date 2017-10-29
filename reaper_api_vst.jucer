@@ -9,8 +9,9 @@
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="reaper_api_vstAU" pluginRTASCategory=""
               aaxIdentifier="com.yourcompany.reaper_api_vst" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.0.2" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" enableIAA="0">
+              jucerVersion="5.2.0" displaySplashScreen="0" reportAppUsage="0"
+              splashScreenColour="Dark" enableIAA="0" cppLanguageStandard="14"
+              companyCopyright="">
   <MAINGROUP id="fAZgx1" name="reaper_api_vst">
     <GROUP id="{E9A9C2E3-521D-CD0A-28EB-512DB79955D2}" name="Source">
       <FILE id="sbS8Ko" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -26,9 +27,9 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="/Users/teemu/codeprojects/VST_SDK/VST3_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="reaper_api_vst"
-                       cppLanguageStandard="c++14" cppLibType="libc++"/>
+                       cppLanguageStandard="c++14" cppLibType="libc++" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="reaper_api_vst"
-                       cppLanguageStandard="c++14" cppLibType="libc++"/>
+                       cppLanguageStandard="c++14" cppLibType="libc++" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../JUCE/modules"/>
@@ -50,9 +51,11 @@
     <VS2015 targetFolder="Builds/VisualStudio2015">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="reaper_api_vst"/>
+                       isDebug="1" optimisation="1" targetName="reaper_api_vst" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="reaper_api_vst"/>
+                       isDebug="0" optimisation="3" targetName="reaper_api_vst" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../gitrepos/JUCE/modules"/>
@@ -98,10 +101,12 @@
     <VS2017 targetFolder="Builds/VisualStudio2017">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="reaper_api_vst" wholeProgramOptimisation="1"/>
+                       isDebug="1" optimisation="1" targetName="reaper_api_vst" wholeProgramOptimisation="1"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="reaper_api_vst" wholeProgramOptimisation="1"
-                       useRuntimeLibDLL="0"/>
+                       useRuntimeLibDLL="0" debugInformationFormat="ProgramDatabase"
+                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../gitrepos/JUCE/modules"/>
