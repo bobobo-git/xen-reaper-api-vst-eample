@@ -40,6 +40,8 @@ namespace juce
     You should derive your own class from this base class, and if you're building a
     plugin, you should implement a global function called createPluginFilter() which
     creates and returns a new instance of your subclass.
+
+    @tags{Audio}
 */
 class JUCE_API  AudioProcessor
 {
@@ -129,6 +131,16 @@ public:
     */
     virtual void releaseResources() = 0;
 
+    /** Called by the host to indicate that you should reduce your memory footprint.
+
+        You should override this method to free up some memory gracefully, if possible,
+        otherwise the host may forcibly unload your AudioProcessor.
+
+        At the moment this method is only called when your AudioProcessor is an AUv3
+        plug-in running on iOS.
+    */
+    virtual void memoryWarningReceived()     { jassertfalse; }
+
     /** Renders the next block.
 
         When this method is called, the buffer contains a number of channels which is
@@ -148,8 +160,7 @@ public:
 
         If your plug-in has more than one input or output buses then the buffer passed
         to the processBlock methods will contain a bundle of all channels of each bus.
-        Use AudiobusLayout::getBusBuffer to obtain an audio buffer for a
-        particular bus.
+        Use getBusBuffer to obtain an audio buffer for a particular bus.
 
         Note that if you have more outputs than inputs, then only those channels that
         correspond to an input channel are guaranteed to contain sensible data - e.g.
@@ -177,6 +188,13 @@ public:
         be the processor's MIDI output. This means that your processor should be careful to
         clear any incoming messages from the array if it doesn't want them to be passed-on.
 
+        If you have implemented the getBypassParameter method, then you need to check the
+        value of this parameter in this callback and bypass your processing if the parameter
+        has a non-zero value.
+
+        Note that when calling this method as a host, the result may still be bypassed as
+        the parameter that controls the bypass may be non-zero.
+
         Be very careful about what you do in this callback - it's going to be called by
         the audio thread, so any kind of interaction with the UI is absolutely
         out of the question. If you change a parameter in here and need to tell your UI to
@@ -185,7 +203,7 @@ public:
         processBlock() method to send out an asynchronous message. You could also use
         the AsyncUpdater class in a similar way.
 
-        @see AudiobusLayout::getBusBuffer
+        @see getBusBuffer
     */
     virtual void processBlock (AudioBuffer<float>& buffer,
                                MidiBuffer& midiMessages) = 0;
@@ -209,8 +227,7 @@ public:
 
         If your plug-in has more than one input or output buses then the buffer passed
         to the processBlock methods will contain a bundle of all channels of
-        each bus. Use AudiobusLayout::getBusBuffer to obtain a audio buffer
-        for a particular bus.
+        each bus. Use getBusBuffer to obtain a audio buffer for a particular bus.
 
         Note that if you have more outputs than inputs, then only those channels that
         correspond to an input channel are guaranteed to contain sensible data - e.g.
@@ -222,9 +239,9 @@ public:
         but you should only read/write from the ones that your processor is supposed to
         be using.
 
-        If your plugin uses buses, then you should use AudiobusLayout::getBusBuffer()
-        or AudiobusLayout::getChannelIndexInProcessBlockBuffer() to find out which
-        of the input and output channels correspond to which of the buses.
+        If your plugin uses buses, then you should use getBusBuffer() or
+        getChannelIndexInProcessBlockBuffer() to find out which of the input and output
+        channels correspond to which of the buses.
 
         The number of samples in these buffers is NOT guaranteed to be the same for every
         callback, and may be more or less than the estimated value given to prepareToPlay().
@@ -242,6 +259,13 @@ public:
         be the processor's MIDI output. This means that your processor should be careful to
         clear any incoming messages from the array if it doesn't want them to be passed-on.
 
+        If you have implemented the getBypassParameter method, then you need to check the
+        value of this parameter in this callback and bypass your processing if the parameter
+        has a non-zero value.
+
+        Note that when calling this method as a host, the result may still be bypassed as
+        the parameter that controls the bypass may be non-zero.
+
         Be very careful about what you do in this callback - it's going to be called by
         the audio thread, so any kind of interaction with the UI is absolutely
         out of the question. If you change a parameter in here and need to tell your UI to
@@ -250,7 +274,7 @@ public:
         processBlock() method to send out an asynchronous message. You could also use
         the AsyncUpdater class in a similar way.
 
-        @see AudiobusLayout::getBusBuffer
+        @see getBusBuffer
     */
     virtual void processBlock (AudioBuffer<double>& buffer,
                                MidiBuffer& midiMessages);
@@ -357,7 +381,7 @@ public:
 
         //==============================================================================
         /** The bus's current layout. This will be AudioChannelSet::disabled() if the current
-            layout is dfisabled.
+            layout is disabled.
             @see AudioChannelSet
         */
         const AudioChannelSet& getCurrentLayout() const noexcept        { return layout; }
@@ -881,6 +905,21 @@ public:
     virtual void reset();
 
     //==============================================================================
+    /** Returns the parameter that controls the AudioProcessor's bypass state.
+
+        If this method returns a nullptr then you can still control the bypass by
+        calling processBlockBypassed instaed of processBlock. On the other hand,
+        if this method returns a non-null value, you should never call
+        processBlockBypassed but use the returned parameter to conrol the bypass
+        state instead.
+
+        A plug-in can override this function to return a parameter which control's your
+        plug-in's bypass. You should always check the value of this parameter in your
+        processBlock callback and bypass any effects if it is non-zero.
+    */
+    virtual AudioProcessorParameter* getBypassParameter() const        { return nullptr; }
+
+    //==============================================================================
     /** Returns true if the processor is being run in an offline mode for rendering.
 
         If the processor is being run live on realtime signals, this returns false.
@@ -952,14 +991,14 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use the
         AudioProcessorParameter class instead to manage your parameters.
     */
-    virtual int getNumParameters();
+    JUCE_DEPRECATED (virtual int getNumParameters());
 
     /** Returns the name of a particular parameter.
 
         NOTE! This method will eventually be deprecated! It's recommended that you use the
         AudioProcessorParameter class instead to manage your parameters.
     */
-    virtual const String getParameterName (int parameterIndex);
+    JUCE_DEPRECATED (virtual const String getParameterName (int parameterIndex));
 
     /** Returns the ID of a particular parameter.
 
@@ -970,7 +1009,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use the
         AudioProcessorParameterWithID class instead to manage your parameters.
      */
-    virtual String getParameterID (int index);
+    JUCE_DEPRECATED (virtual String getParameterID (int index));
 
     /** Called by the host to find out the value of one of the processor's parameters.
 
@@ -983,7 +1022,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use the
         AudioProcessorParameter class instead to manage your parameters.
     */
-    virtual float getParameter (int parameterIndex);
+    JUCE_DEPRECATED (virtual float getParameter (int parameterIndex));
 
     /** Returns the name of a parameter as a text string with a preferred maximum length.
         If you want to provide customised short versions of your parameter names that
@@ -995,13 +1034,13 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getName() instead.
     */
-    virtual String getParameterName (int parameterIndex, int maximumStringLength);
+    JUCE_DEPRECATED (virtual String getParameterName (int parameterIndex, int maximumStringLength));
 
     /** Returns the value of a parameter as a text string.
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getText() instead.
     */
-    virtual const String getParameterText (int parameterIndex);
+    JUCE_DEPRECATED (virtual const String getParameterText (int parameterIndex));
 
     /** Returns the value of a parameter as a text string with a preferred maximum length.
         If you want to provide customised short versions of your parameter values that
@@ -1013,7 +1052,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getText() instead.
     */
-    virtual String getParameterText (int parameterIndex, int maximumStringLength);
+    JUCE_DEPRECATED (virtual String getParameterText (int parameterIndex, int maximumStringLength));
 
     /** Returns the number of discrete steps that this parameter can represent.
 
@@ -1033,7 +1072,7 @@ public:
 
         @see isParameterDiscrete
     */
-    virtual int getParameterNumSteps (int parameterIndex);
+    JUCE_DEPRECATED (virtual int getParameterNumSteps (int parameterIndex));
 
     /** Returns the default number of steps for a parameter.
 
@@ -1057,7 +1096,7 @@ public:
 
         @see getParameterNumSteps
     */
-    virtual bool isParameterDiscrete (int parameterIndex) const;
+    JUCE_DEPRECATED (virtual bool isParameterDiscrete (int parameterIndex) const);
 
     /** Returns the default value for the parameter.
         By default, this just returns 0.
@@ -1066,7 +1105,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getDefaultValue() instead.
     */
-    virtual float getParameterDefaultValue (int parameterIndex);
+    JUCE_DEPRECATED (virtual float getParameterDefaultValue (int parameterIndex));
 
     /** Some plugin types may be able to return a label string for a
         parameter's units.
@@ -1074,7 +1113,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getLabel() instead.
     */
-    virtual String getParameterLabel (int index) const;
+    JUCE_DEPRECATED (virtual String getParameterLabel (int index) const);
 
     /** This can be overridden to tell the host that particular parameters operate in the
         reverse direction. (Not all plugin formats or hosts will actually use this information).
@@ -1082,7 +1121,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::isOrientationInverted() instead.
     */
-    virtual bool isParameterOrientationInverted (int index) const;
+    JUCE_DEPRECATED (virtual bool isParameterOrientationInverted (int index) const);
 
     /** The host will call this method to change the value of one of the processor's parameters.
 
@@ -1100,7 +1139,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::setValue() instead.
     */
-    virtual void setParameter (int parameterIndex, float newValue);
+    JUCE_DEPRECATED (virtual void setParameter (int parameterIndex, float newValue));
 
     /** Your processor can call this when it needs to change one of its parameters.
 
@@ -1123,7 +1162,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::isAutomatable() instead.
     */
-    virtual bool isParameterAutomatable (int parameterIndex) const;
+    JUCE_DEPRECATED (virtual bool isParameterAutomatable (int parameterIndex) const);
 
     /** Should return true if this parameter is a "meta" parameter.
         A meta-parameter is a parameter that changes other params. It is used
@@ -1133,7 +1172,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::isMetaParameter() instead.
     */
-    virtual bool isMetaParameter (int parameterIndex) const;
+    JUCE_DEPRECATED (virtual bool isMetaParameter (int parameterIndex) const);
 
     /** Should return the parameter's category.
         By default, this returns the "generic" category.
@@ -1141,7 +1180,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::getCategory() instead.
     */
-    virtual AudioProcessorParameter::Category getParameterCategory (int parameterIndex) const;
+    JUCE_DEPRECATED (virtual AudioProcessorParameter::Category getParameterCategory (int parameterIndex) const);
 
     /** Sends a signal to the host to tell it that the user is about to start changing this
         parameter.
@@ -1154,7 +1193,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::beginChangeGesture() instead.
     */
-    void beginParameterChangeGesture (int parameterIndex);
+    JUCE_DEPRECATED (void beginParameterChangeGesture (int parameterIndex));
 
     /** Tells the host that the user has finished changing this parameter.
 
@@ -1166,7 +1205,7 @@ public:
         NOTE! This method will eventually be deprecated! It's recommended that you use
         AudioProcessorParameter::endChangeGesture() instead.
     */
-    void endParameterChangeGesture (int parameterIndex);
+    JUCE_DEPRECATED (void endParameterChangeGesture (int parameterIndex));
 
     /** The processor can call this when something (apart from a parameter value) has changed.
 
@@ -1373,7 +1412,9 @@ public:
     /** Returns the name of one of the processor's input channels.
 
         These functions are deprecated: your audio processor can inform the host
-        on channel layouts and names via the methods in the AudiobusLayout class.
+        on channel layouts and names via the methods in the AudioChannelSet class.
+
+        @see getBus, Bus::getCurrentLayout, AudioChannelSet
      */
     JUCE_DEPRECATED (virtual const String getInputChannelName  (int channelIndex) const);
     JUCE_DEPRECATED (virtual const String getOutputChannelName (int channelIndex) const);
@@ -1408,9 +1449,9 @@ public:
 
     /** @internal */
     static void JUCE_CALLTYPE setTypeOfNextNewPlugin (WrapperType);
-	NamedValueSet& getProperties() { return customProperties; }
-	virtual void afterCreate() {}
 
+	NamedValueSet& getProperties() { return m_properties; }
+	virtual void afterCreate() {}
 protected:
     /** Callback to query if the AudioProcessor supports a specific layout.
 
@@ -1472,6 +1513,7 @@ protected:
         bool isActivatedByDefault;
     };
 
+    /** Structure used for AudioProcessor Callbacks */
     struct BusesProperties
     {
         /** The layouts of the input buses */
@@ -1520,7 +1562,10 @@ protected:
     /** @internal */
     void sendParamChangeMessageToListeners (int parameterIndex, float newValue);
 
+	
+
 private:
+	NamedValueSet m_properties;
     //==============================================================================
     struct InOutChannelPair
     {
@@ -1605,17 +1650,15 @@ private:
     void audioIOChanged (bool busNumberChanged, bool channelNumChanged);
     void getNextBestLayout (const BusesLayout&, BusesLayout&) const;
 
-	NamedValueSet customProperties;
-
-
     template <typename floatType>
     void processBypassed (AudioBuffer<floatType>&, MidiBuffer&);
 
-   #if JucePlugin_Build_VST3
+    friend class AudioProcessorParameter;
+
     friend class JuceVST3EditController;
     friend class JuceVST3Component;
-    Atomic<int> vst3IsPlaying { 0 };
-   #endif
+    friend class AudioUnitPluginInstance;
+    friend class LADSPAPluginInstance;
 
     // This method is no longer used - you can delete it from your AudioProcessor classes.
     JUCE_DEPRECATED_WITH_BODY (virtual bool silenceInProducesSilenceOut() const, { return false; })
