@@ -33,7 +33,7 @@ Reaper_api_vstAudioProcessorEditor::Reaper_api_vstAudioProcessorEditor (Reaper_a
 	if (processor.m_last_w<0 && processor.m_last_h<0)
 		setSize (400, 300);
 	else setSize(processor.m_last_w, processor.m_last_h);
-	startTimer(1000);
+	startTimer(250);
 }
 
 Reaper_api_vstAudioProcessorEditor::~Reaper_api_vstAudioProcessorEditor()
