@@ -7,7 +7,8 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "juce_audio_processors/format_types/juce_VSTInterface.h"
+//#include "juce_audio_processors/format_types/juce_VSTInterface.h"
+#include <pluginterfaces/vst2.x/aeffectx.h>
 #include <pluginterfaces/base/funknown.h>
 
 class IReaperHostApplication;
@@ -67,8 +68,8 @@ public:
 	int m_last_w = -1;
 	int m_last_h = -1;
 private:
-	VstHostCallback m_host_cb = nullptr;
-	VstEffectInterface* m_ae = nullptr;
+	audioMasterCallback m_host_cb = nullptr;
+	AEffect* m_ae = nullptr;
 	IReaperHostApplication* m_reaperhost = nullptr;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)

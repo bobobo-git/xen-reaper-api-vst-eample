@@ -66,18 +66,10 @@ protected:
     /** Constructor for AudioProcessors which use layout maps
         If your AudioProcessor uses layout maps then use this constructor.
     */
-   #if JUCE_COMPILER_SUPPORTS_INITIALIZER_LISTS
     AudioProcessor (const std::initializer_list<const short[2]>& channelLayoutList)
         : AudioProcessor (busesPropertiesFromLayoutArray (layoutListToArray (channelLayoutList)))
     {
     }
-   #else
-    template <int numLayouts>
-    AudioProcessor (const short (&channelLayoutList) [numLayouts][2])
-        : AudioProcessor (busesPropertiesFromLayoutArray (layoutListToArray (channelLayoutList)))
-    {
-    }
-   #endif
 
 public:
     //==============================================================================
@@ -766,12 +758,10 @@ public:
         }
         @endcode
     */
-   #if JUCE_COMPILER_SUPPORTS_INITIALIZER_LISTS
     static bool containsLayout (const BusesLayout& layouts, const std::initializer_list<const short[2]>& channelLayoutList)
     {
         return containsLayout (layouts, layoutListToArray (channelLayoutList));
     }
-   #endif
 
     template <int numLayouts>
     static bool containsLayout (const BusesLayout& layouts, const short (&channelLayoutList) [numLayouts][2])
@@ -1349,6 +1339,34 @@ public:
                                                   bool idForAudioSuite) const;
 
     //==============================================================================
+    /** Some plug-ins support sharing response curve data with the host so that it can
+        display this curve on a console or in the mixer panel. For example, ProTools
+        allows you to see the total EQ curve of a track. It does this by interrogating
+        each plug-in for their internal EQ curve. */
+    struct CurveData
+    {
+        enum class Type  : int
+        {
+            EQ,             // an EQ curve - input is in Hz, output is in dB
+            Dynamics,       // a dynamics curve - input and output is in dB
+            GainReduction,  // a gain reduction curve - input and output is in dB
+
+            Unknown = -1
+        };
+
+        std::function<float (float)> curve;    // a function which represents your curve (such as an eq)
+        Range<float> xRange, yRange;           // the data range of your curve
+
+        // For some curve types, your plug-in may already measure the current input and output values.
+        // An host can use to indicate where on the curve the current signal is (for example
+        // by putting a dot on the curve). Simply leave these strings empty if you do not want to
+        // support this.
+        String xMeterID, yMeterID;
+    };
+
+    virtual CurveData getResponseCurve (CurveData::Type /*curveType*/) const      { return {}; }
+
+    //==============================================================================
     /** Not for public use - this is called before deleting an editor component. */
     void editorBeingDeleted (AudioProcessorEditor*) noexcept;
 
@@ -1362,13 +1380,18 @@ public:
         wrapperType_AudioUnitv3,
         wrapperType_RTAS,
         wrapperType_AAX,
-        wrapperType_Standalone
+        wrapperType_Standalone,
+        wrapperType_Unity
     };
 
     /** When loaded by a plugin wrapper, this flag will be set to indicate the type
         of plugin within which the processor is running.
     */
     WrapperType wrapperType;
+
+    /** Returns a textual description of a WrapperType value */
+    static const char* getWrapperTypeDescription (AudioProcessor::WrapperType) noexcept;
+
 
     /** A struct containing information about the DAW track inside which your
         AudioProcessor is loaded. */
@@ -1449,11 +1472,12 @@ public:
 
     /** @internal */
     static void JUCE_CALLTYPE setTypeOfNextNewPlugin (WrapperType);
-
-	NamedValueSet& getProperties() { return m_properties; }
-	virtual void afterCreate() {}
+	
+	virtual void afterCreate() {};
+	NamedValueSet& getProperties() { return customProperties; }
 protected:
-    /** Callback to query if the AudioProcessor supports a specific layout.
+	NamedValueSet customProperties;
+	/** Callback to query if the AudioProcessor supports a specific layout.
 
         This callback is called when the host probes the supported bus layouts via
         the checkBusesLayoutSupported method. You should override this callback if you
@@ -1562,10 +1586,7 @@ protected:
     /** @internal */
     void sendParamChangeMessageToListeners (int parameterIndex, float newValue);
 
-	
-
 private:
-	NamedValueSet m_properties;
     //==============================================================================
     struct InOutChannelPair
     {
@@ -1595,7 +1616,6 @@ private:
         return layouts;
     }
 
-   #if JUCE_COMPILER_SUPPORTS_INITIALIZER_LISTS
     static Array<InOutChannelPair> layoutListToArray (const std::initializer_list<const short[2]>& configuration)
     {
         Array<InOutChannelPair> layouts;
@@ -1605,7 +1625,6 @@ private:
 
         return layouts;
     }
-   #endif
 
     //==============================================================================
     static BusesProperties busesPropertiesFromLayoutArray (const Array<InOutChannelPair>&);

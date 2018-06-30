@@ -198,7 +198,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 	{
 		// VST2
 		var cbvar = getProperties()["audioMasterCallback"];
-		m_host_cb = (VstHostCallback)(int64)cbvar;
+		m_host_cb = (audioMasterCallback)(int64)cbvar;
 		if (m_host_cb == nullptr)
 		{
 			LogToReaper("audiomastercallback null\n");
@@ -211,7 +211,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		if (errcnt > 0)
 			LogToReaper("some errors when loading reaper api functions\n");
 		var aevar = getProperties()["aeffect"];
-		m_ae = (VstEffectInterface*)(int64)aevar;
+		m_ae = (AEffect*)(int64)aevar;
 		if (m_ae == nullptr)
 			LogToReaper("aeffect is null\n");
 		return;
@@ -313,7 +313,7 @@ void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
 	// and add an undo entry etc.
 	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
 	if (m_host_cb!=nullptr)
-		m_host_cb(m_ae, hostOpcodeParameterChanged, -1, 0, nullptr, 0.0f);
+		m_host_cb(m_ae, audioMasterAutomate, -1, 0, nullptr, 0.0f);
 	// vst3...uhum...
 }
 
