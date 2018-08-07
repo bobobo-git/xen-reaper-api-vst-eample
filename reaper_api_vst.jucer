@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="OIaj6o" name="reaper_api_vst" projectType="audioplug" version="1.0.0"
               bundleIdentifier="com.yourcompany.reaper_api_vst" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="1" buildAU="0" buildAUv3="0" buildRTAS="0"
+              buildVST="1" buildVST3="0" buildAU="0" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" pluginName="reaper_api_vst"
               pluginDesc="reaper_api_vst" pluginManufacturer="Xenakios" pluginManufacturerCode="xens"
               pluginCode="Oiaj" pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
@@ -10,7 +10,7 @@
               pluginAUExportPrefix="reaper_api_vstAU" aaxIdentifier="com.yourcompany.reaper_api_vst"
               pluginAAXCategory="2" jucerVersion="5.3.2" displaySplashScreen="0"
               reportAppUsage="0" splashScreenColour="Dark" enableIAA="0" cppLanguageStandard="latest"
-              companyCopyright="" pluginFormats="buildVST,buildVST3" companyName="Xenakios">
+              companyCopyright="" pluginFormats="buildVST" companyName="Xenakios">
   <MAINGROUP id="fAZgx1" name="reaper_api_vst">
     <GROUP id="{E9A9C2E3-521D-CD0A-28EB-512DB79955D2}" name="Source">
       <FILE id="sbS8Ko" name="PluginProcessor.cpp" compile="1" resource="0"

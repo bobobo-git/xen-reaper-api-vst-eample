@@ -191,7 +191,7 @@ void Reaper_api_vstAudioProcessor::setStateInformation (const void* data, int si
 	}
 }
 
-
+/*
 void Reaper_api_vstAudioProcessor::afterCreate()
 {
 	if (getProperties().contains("audioMasterCallback") == true)
@@ -238,7 +238,7 @@ void Reaper_api_vstAudioProcessor::afterCreate()
 		}
 	}
 }
-
+*/
 void Reaper_api_vstAudioProcessor::setTrackVolume(double gain)
 {
 	MediaTrack* tr = getReaperTrack();
@@ -290,9 +290,9 @@ MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 {
 	if (m_reaperhost != nullptr)
 		return (MediaTrack*)m_reaperhost->getReaperParent(1);
-	if (m_ae == nullptr)
+	if (!m_vst2host_cb)
 		return nullptr;
-	return (MediaTrack*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
+	return (MediaTrack*)m_vst2host_cb(0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
 }
 
 // Demonstrates how to get the Reaper MediaItem_Take where the plugin is loaded.
@@ -301,9 +301,9 @@ MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 {
 	if (m_reaperhost != nullptr)
 		return (MediaItem_Take*)m_reaperhost->getReaperParent(2);
-	if (m_ae == nullptr)
+	if (!m_vst2host_cb)
 		return nullptr;
-	return (MediaItem_Take*)m_host_cb(m_ae, 0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
+	return (MediaItem_Take*)m_vst2host_cb(0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
 }
 
 void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
@@ -312,9 +312,25 @@ void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
 	// That will be considered a generic state change of the plugin in Reaper so that Reaper will query the current plugin state
 	// and add an undo entry etc.
 	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
-	if (m_host_cb!=nullptr)
-		m_host_cb(m_ae, audioMasterAutomate, -1, 0, nullptr, 0.0f);
+	if (m_vst2host_cb)
+		m_vst2host_cb(audioMasterAutomate, -1, 0, nullptr, 0.0f);
 	// vst3...uhum...
+}
+
+juce::pointer_sized_int Reaper_api_vstAudioProcessor::handleVstManufacturerSpecific(juce::int32, juce::pointer_sized_int, void *, float)
+{
+	return juce::pointer_sized_int();
+}
+
+void Reaper_api_vstAudioProcessor::handleVstHostCallbackAvailable(std::function<VstHostCallbackType>&& hostcallback)
+{
+	m_vst2host_cb = hostcallback;
+	int errcnt = REAPERAPI_LoadAPI([this,hostcallback](const char* funcname)
+	{
+		return (void*)hostcallback(0xdeadbeef, 0xdeadf00d, 0, (void*)funcname, 0.0);
+	});
+	if (errcnt > 0)
+		LogToReaper("some errors when loading reaper api functions\n");
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

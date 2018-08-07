@@ -18,7 +18,7 @@ void LogToReaper(String txt);
 class MediaTrack;
 class MediaItem_Take;
 
-class Reaper_api_vstAudioProcessor  : public AudioProcessor
+class Reaper_api_vstAudioProcessor  : public AudioProcessor, public VSTCallbackHandler
 {
 public:
     //==============================================================================
@@ -56,7 +56,7 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-	void afterCreate() override;
+	//void afterCreate() override;
 	void setTrackVolume(double gain);
 	String getTakeName();
 	void setTakeName(String name);
@@ -67,9 +67,10 @@ public:
 	void extendedStateHasChanged();
 	int m_last_w = -1;
 	int m_last_h = -1;
+	juce::pointer_sized_int handleVstManufacturerSpecific(juce::int32, juce::pointer_sized_int, void *, float) override;
+	void handleVstHostCallbackAvailable(std::function<VstHostCallbackType>&& callback) override;
 private:
-	audioMasterCallback m_host_cb = nullptr;
-	AEffect* m_ae = nullptr;
+	std::function<VstHostCallbackType> m_vst2host_cb;
 	IReaperHostApplication* m_reaperhost = nullptr;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
