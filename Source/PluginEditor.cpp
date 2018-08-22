@@ -152,7 +152,8 @@ void Reaper_api_vstAudioProcessorEditor::buttonClicked(Button * but)
 				trackmenus[track]->addSubMenu(CharPointer_UTF8(parnamebuf), *fxmenus[fxcount]);
 				++fxcount;
 			}
-			menu.addSubMenu(String(i), *trackmenus[track], true);
+			GetSetMediaTrackInfo_String(track, "P_NAME", parnamebuf, false);
+			menu.addSubMenu(String(i)+":"+String(CharPointer_UTF8(parnamebuf)), *trackmenus[track], true);
 		}
 		int r = menu.show();
 		if (r > 0)
