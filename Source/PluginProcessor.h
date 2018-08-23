@@ -7,12 +7,6 @@ respect the separate licensing of JUCE and the Reaper SDK files.
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-//#include "juce_audio_processors/format_types/juce_VSTInterface.h"
-#include <pluginterfaces/vst2.x/aeffectx.h>
-#include <pluginterfaces/base/funknown.h>
-
-class IReaperHostApplication;
-
 void LogToReaper(String txt);
 
 class MediaTrack;
@@ -71,7 +65,6 @@ public:
 	void handleVstHostCallbackAvailable(std::function<VstHostCallbackType>&& callback) override;
 private:
 	std::function<VstHostCallbackType> m_vst2host_cb;
-	IReaperHostApplication* m_reaperhost = nullptr;
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Reaper_api_vstAudioProcessor)
 };

@@ -288,8 +288,6 @@ void Reaper_api_vstAudioProcessor::setTrackName(String name)
 
 MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 {
-	if (m_reaperhost != nullptr)
-		return (MediaTrack*)m_reaperhost->getReaperParent(1);
 	if (!m_vst2host_cb)
 		return nullptr;
 	return (MediaTrack*)m_vst2host_cb(0xDEADBEEF, 0xDEADF00E, 1, 0, 0.0);
@@ -299,8 +297,6 @@ MediaTrack * Reaper_api_vstAudioProcessor::getReaperTrack()
 
 MediaItem_Take * Reaper_api_vstAudioProcessor::getReaperTake()
 {
-	if (m_reaperhost != nullptr)
-		return (MediaItem_Take*)m_reaperhost->getReaperParent(2);
 	if (!m_vst2host_cb)
 		return nullptr;
 	return (MediaItem_Take*)m_vst2host_cb(0xDEADBEEF, 0xDEADF00E, 2, 0, 0.0);
@@ -312,8 +308,8 @@ void Reaper_api_vstAudioProcessor::extendedStateHasChanged()
 	// That will be considered a generic state change of the plugin in Reaper so that Reaper will query the current plugin state
 	// and add an undo entry etc.
 	// Doing it this way seems to be necessary since JUCE does not support notifying a change for parameter -1.
-	if (m_vst2host_cb)
-		m_vst2host_cb(audioMasterAutomate, -1, 0, nullptr, 0.0f);
+	//if (m_vst2host_cb)
+	//	m_vst2host_cb(audioMasterAutomate, -1, 0, nullptr, 0.0f);
 	// vst3...uhum...
 }
 
